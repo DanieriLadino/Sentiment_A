@@ -1,7 +1,21 @@
 from textblob import TextBlob
 import streamlit as st
 from PIL import Image
-from googletrans import Translator
+import json
+import urllib.parse
+import urllib.request
+
+
+def traducir(texto, origen="es", destino="en"):
+    """Traduce usando el servicio público de Google Translate (sin librerías extra)."""
+    params = urllib.parse.urlencode({
+        "client": "gtx", "sl": origen, "tl": destino, "dt": "t", "q": texto
+    })
+    url = "https://translate.googleapis.com/translate_a/single?" + params
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    with urllib.request.urlopen(req, timeout=10) as resp:
+        data = json.loads(resp.read().decode("utf-8"))
+    return "".join(parte[0] for parte in data[0] if parte[0])
 
 # ---------- Configuración de la página ----------
 st.set_page_config(page_title="Análisis de Sentimiento", page_icon="💬", layout="centered")
@@ -79,7 +93,6 @@ Va de **0** (totalmente objetivo) a **1** (totalmente subjetivo).
     st.caption("Hecho con TextBlob + Streamlit 💜")
 
 # ---------- Análisis ----------
-translator = Translator()
 
 st.markdown("### ✍️ Escribe la frase que deseas analizar")
 text = st.text_area("Tu frase:", placeholder="Ej: Hoy es un día maravilloso y me siento muy feliz",
@@ -91,7 +104,7 @@ if st.button("🔍 Analizar sentimiento", use_container_width=True, type="primar
     else:
         with st.spinner("Analizando tu frase..."):
             try:
-                trans_text = translator.translate(text, src="es", dest="en").text
+                trans_text = traducir(text)
             except Exception:
                 st.error("No se pudo traducir el texto. Revisa tu conexión e inténtalo de nuevo.")
                 st.stop()
