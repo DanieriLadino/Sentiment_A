@@ -1,6 +1,5 @@
 from textblob import TextBlob
 import streamlit as st
-from PIL import Image
 import json
 import urllib.parse
 import urllib.request
@@ -23,44 +22,51 @@ st.set_page_config(page_title="Análisis de Sentimiento", page_icon="💬", layo
 # ---------- Estilos ----------
 st.markdown("""
 <style>
-    .stApp {
-        background: linear-gradient(160deg, #fdfbff 0%, #eef2ff 50%, #fdf2f8 100%);
-    }
+    .stApp, header[data-testid="stHeader"] { background: #000000; }
+    section[data-testid="stSidebar"] { background: #0d0d0d; border-right: 1px solid #222; }
+    .stApp, .stApp p, .stApp label, .stApp li, .stApp h1, .stApp h2, .stApp h3,
+    section[data-testid="stSidebar"] * { color: #f5f5f5; }
     .titulo {
         text-align: center;
         font-size: 2.8rem;
         font-weight: 800;
-        background: linear-gradient(90deg, #6366f1, #ec4899, #f59e0b);
+        background: linear-gradient(90deg, #818cf8, #f472b6, #fbbf24);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         margin-bottom: 0;
     }
     .subtitulo {
         text-align: center;
-        color: #6b7280;
+        color: #9ca3af !important;
         font-size: 1.1rem;
         margin-top: 0.2rem;
         margin-bottom: 1.5rem;
+    }
+    .stTextArea textarea {
+        background: #111111; color: #f5f5f5; border: 1px solid #333; border-radius: 12px;
     }
     .tarjeta {
         border-radius: 18px;
         padding: 1.4rem;
         text-align: center;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.08);
         margin-top: 1rem;
     }
     .tarjeta h2 { margin: 0; font-size: 2rem; }
     .tarjeta p  { margin: 0.3rem 0 0 0; font-size: 1.1rem; }
-    .positivo { background: #dcfce7; color: #166534; border: 2px solid #86efac; }
-    .negativo { background: #fee2e2; color: #991b1b; border: 2px solid #fca5a5; }
-    .neutral  { background: #f3f4f6; color: #374151; border: 2px solid #d1d5db; }
+    .positivo { background: #052e16; border: 2px solid #22c55e; }
+    .positivo h2, .positivo p { color: #4ade80 !important; }
+    .negativo { background: #2a0a0a; border: 2px solid #ef4444; }
+    .negativo h2, .negativo p { color: #f87171 !important; }
+    .neutral  { background: #171717; border: 2px solid #525252; }
+    .neutral h2, .neutral p { color: #d4d4d4 !important; }
     .emoji-grande { font-size: 4rem; }
     div[data-testid="stMetric"] {
-        background: white;
+        background: #111111;
+        border: 1px solid #262626;
         border-radius: 14px;
         padding: 1rem;
-        box-shadow: 0 4px 14px rgba(0,0,0,0.06);
     }
+    div[data-testid="stMetricValue"] { color: #ffffff; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -68,12 +74,6 @@ st.markdown("""
 st.markdown('<p class="titulo">Análisis de Sentimiento</p>', unsafe_allow_html=True)
 st.markdown('<p class="subtitulo">Descubre si tu frase transmite alegría, tristeza o neutralidad ✨</p>',
             unsafe_allow_html=True)
-
-try:
-    image = Image.open('emoticones.jpg')
-    st.image(image, use_container_width=True)
-except FileNotFoundError:
-    pass
 
 # ---------- Barra lateral ----------
 with st.sidebar:
